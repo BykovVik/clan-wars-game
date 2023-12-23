@@ -1,2 +1,6 @@
 env
 .env
+bot.session
+bot.session-journal
+
+**__py_cache__/**
