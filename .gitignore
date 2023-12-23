@@ -1,4 +1,5 @@
 env
+data
 .env
 bot.session
 bot.session-journal
