@@ -1,4 +1,4 @@
-from ..models import get_session, Clan
+from models import get_session, Clan
 
 Session = get_session()
 
@@ -7,10 +7,12 @@ class ClanController:
     CRUD operations for the clan table
     """
     
-    def add_clan(self, title, score, rating):
+    def add_clan(self, title, chat_id, wins, losses, rating):
         clan = Clan(
             title = title,
-            score = score,
+            chat_id = chat_id,
+            wins = wins,
+            losses = losses,
             rating = rating
         )
         Session.add(clan)
@@ -20,11 +22,12 @@ class ClanController:
         clan = Session.query(Clan).filter_by(chat_id=chat_id)
         return clan
     
-    def update_clan(self, title, chat_id, score, rating):
+    def update_clan(self, title, chat_id, wins, losses, rating):
         clan = Session.query(Clan).filter_by(chat_id=chat_id)
         clan.title = title,
         chat_id=chat_id
-        clan.score = score,
+        clan.wins = wins,
+        clan.losses = losses,
         clan.rating = rating
         Session.commit()
 

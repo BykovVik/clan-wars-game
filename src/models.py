@@ -31,8 +31,10 @@ class Clan(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String)
+    chat_id = Column(Integer)
     users = relationship("User", back_populates="clan")
-    score = Column(Integer)
+    wins = Column(Integer)
+    losses = Column(Integer)
     rating = Column(Integer)
 
 def get_session():
