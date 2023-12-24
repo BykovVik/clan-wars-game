@@ -57,7 +57,6 @@ async def start_command(event):
                     ]
                 )
             else:
-                await event.reply('Вы уже зарегистрированы как игрок. Для подробной информации о вашем аккаунте игрока, вы можите обратится к нашему боту в личные сообщения, запросив комманду `/info`')
                 await event.respond(
                     "Вы уже зарегистрированы как игрок. Для подробной информации о вашем аккаунте игрока, вы можите обратится к нашему боту в личные сообщения, запросив комманду `/info`",
                     buttons = [
@@ -79,7 +78,7 @@ async def start_command(event):
 
 @bot.on(events.CallbackQuery)
 async def callback_answers(event):
-    
+
     #create main objects
     clan_controller = ClanController(event.chat.id)
     clan = clan_controller.get_clan()
@@ -108,6 +107,12 @@ async def callback_answers(event):
         )
         await event.answer("Теперь вы играете за чат в котором вы сейчас находитесь")
         await bot.delete_messages(event.chat.id, event.message_id)
+
+    #delete player query
+    if event.data == b'delete_player':
+        await event.answer("Удаление игрока")
+        await bot.delete_messages(event.chat.id, event.message_id)
+        user_controller.delete_user()
 
     #rules of the game query
     if event.data == b'rules_of_the_game':

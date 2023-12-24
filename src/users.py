@@ -50,7 +50,7 @@ class UserController:
         user.clan_id = chat_id
         self.session.commit()
 
-    def delete_user(self, user_id):
+    def delete_user(self):
         user = self.session.query(User).filter_by(user_id=self.user_id).first()
         self.session.delete(user)
         self.session.commit()
