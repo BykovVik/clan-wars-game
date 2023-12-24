@@ -25,6 +25,10 @@ class UserController:
         user = self.session.query(User).filter_by(user_id=self.user_id).first()
         return user
     
+    def get_all_users(self):
+        users = self.session.query(User).all()
+        return users
+    
     def update_user_name(self, name):
         user = self.session.query(User).filter_by(user_id=self.user_id).first()
         user.name = name

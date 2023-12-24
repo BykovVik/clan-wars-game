@@ -24,6 +24,10 @@ class ClanController:
         clan = self.session.query(Clan).filter_by(chat_id=self.chat_id).first()
         return clan
     
+    def get_all_clans(self):
+        clans = self.session.query(Clan).all()
+        return clans
+    
     def update_clan_title(self, title):
         clan = self.session.query(Clan).filter_by(chat_id=self.chat_id).first()
         clan.title = title,
