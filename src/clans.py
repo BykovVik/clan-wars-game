@@ -1,4 +1,4 @@
-from models import get_session, Clan
+from models import Clan, session
 
 class ClanController:
     """
@@ -6,7 +6,7 @@ class ClanController:
     """
 
     def __init__(self, chat_id):
-        self.session = get_session()
+        self.session = session
         self.chat_id = chat_id
     
     def add_clan(self, title, chat_id, wins, losses, rating):

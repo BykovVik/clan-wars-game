@@ -1,21 +1,22 @@
-from .models import get_session, User
+from models import User, session
 
 class UserController:
     """
     CRUD operations for the user table
     """
     def __init__(self, user_id):
-        self.session = get_session()
+        self.session = session
         self.user_id = user_id
     
-    def add_user(self, name, user_id, chat_id):
+    def add_user(self, name, user_id, clan_id, clan):
         player = User(
             name = name,
             user_id = user_id,
             score = 0,
             penalties = 0,
             rating = 0,
-            clan_id = chat_id
+            clan_id = clan_id,
+            clan = clan
         )
         self.session.add(player)
         self.session.commit()

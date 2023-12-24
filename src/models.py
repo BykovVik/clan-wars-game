@@ -6,6 +6,9 @@ engine = create_engine('postgresql://admin:admin@localhost/tg_game')
 
 class Base(DeclarativeBase): pass
 
+Session = sessionmaker(bind=engine)
+session = Session()
+
 class User(Base):
     """
     Сreating a users table in the database
@@ -36,14 +39,6 @@ class Clan(Base):
     wins = Column(Integer)
     losses = Column(Integer)
     rating = Column(Integer)
-
-def get_session():
-    """
-    Returns a session for working with the database
-    """
-
-    Session = sessionmaker(bind=engine)
-    return Session()
 
 def create_all_tables():
     """
