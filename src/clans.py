@@ -1,11 +1,13 @@
 from models import get_session, Clan
 
-Session = get_session()
-
 class ClanController:
     """
     CRUD operations for the clan table
     """
+
+    def __init__(self, chat_id):
+        self.session = get_session()
+        self.chat_id = chat_id
     
     def add_clan(self, title, chat_id, wins, losses, rating):
         clan = Clan(
@@ -15,23 +17,34 @@ class ClanController:
             losses = losses,
             rating = rating
         )
-        Session.add(clan)
-        Session.commit()
+        self.session.add(clan)
+        self.session.commit()
 
-    def get_clan(self, chat_id):
-        clan = Session.query(Clan).filter_by(chat_id=chat_id)
+    def get_clan(self):
+        clan = self.session.query(Clan).filter_by(chat_id=self.chat_id).first()
         return clan
     
-    def update_clan(self, title, chat_id, wins, losses, rating):
-        clan = Session.query(Clan).filter_by(chat_id=chat_id)
+    def update_clan_title(self, title):
+        clan = self.session.query(Clan).filter_by(chat_id=self.chat_id).first()
         clan.title = title,
-        chat_id=chat_id
-        clan.wins = wins,
-        clan.losses = losses,
-        clan.rating = rating
-        Session.commit()
+        self.session.commit()
 
-    def delete_clan(self, chat_id):
-        clan = Session.query(Clan).filter_by(chat_id=chat_id)
-        Session.delete(clan)
-        Session.commit()
+    def update_clan_wins(self, wins):
+        clan = self.session.query(Clan).filter_by(chat_id=self.chat_id).first()
+        clan.wins = wins
+        self.session.commit()
+
+    def update_clan_losses(self, losses):
+        clan = self.session.query(Clan).filter_by(chat_id=self.chat_id).first()
+        clan.losses = losses
+        self.session.commit()
+
+    def update_clan_rating(self, rating):
+        clan = self.session.query(Clan).filter_by(chat_id=self.chat_id).first()
+        clan.rating = rating
+        self.session.commit()
+
+    def delete_clan(self):
+        clan = self.session.query(Clan).filter_by(chat_id=self.chat_id).first()
+        self.session.delete(clan)
+        self.session.commit()
