@@ -153,6 +153,10 @@ async def callback_answers(event):
             await bot.delete_messages(event.chat.id, event.message_id)
             await bot.send_message(event.chat.id, "Юзер инфо")
 
+    #start battle
+    if event.data == b'battle':
+        await event.answer("Запрос на битву")
+        await bot.delete_messages(event.chat.id, event.message_id)
     
 
 #check database connect
