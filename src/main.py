@@ -1,12 +1,10 @@
-from telethon import TelegramClient, events, Button
-from dotenv import load_dotenv
-import os
 from models import create_all_tables
 from clans import ClanController
 from users import UserController
+from bot import BOT
+from telethon import events, Button
 
-load_dotenv()
-bot = TelegramClient('bot', os.getenv("API_ID"), os.getenv("API_HASH")).start(bot_token=os.getenv("TOKEN"))
+bot = BOT
 
 
 @bot.on(events.NewMessage())
@@ -94,7 +92,7 @@ async def start_command(event):
                     await event.respond(
                     "КЛАН с таким именем найден зарегестрирован в игре, хотите бросить ему вызов? 👊🏻 ",
                     buttons = [
-                        [Button.inline('Вызвать КЛАН', b'battle')]
+                        [Button.inline('Вызвать КЛАН', "battle_{}".format(check_war.chat_id))]
                     ]
                 )
 
@@ -109,32 +107,44 @@ async def callback_answers(event):
 
     #add clan query
     if event.data == b'add_clan':
-        clan_controller.add_clan(
-            title = event.chat.title,
-            chat_id = event.chat.id,
-            wins = 0,
-            losses = 0,
-            rating = 0
-        )
-        await event.answer("Клан вашего чата успешно создан")
-        await bot.delete_messages(event.chat.id, event.message_id)
+        if clan is None:
+            clan_controller.add_clan(
+                title = event.chat.title,
+                chat_id = event.chat.id,
+                wins = 0,
+                losses = 0,
+                rating = 0
+            )
+            await event.answer("Клан вашего чата успешно создан")
+            await bot.delete_messages(event.chat.id, event.message_id)
+        else:
+            await event.answer("У вас уже зарегестрирован КЛАН")
+            await bot.delete_messages(event.chat.id, event.message_id)
 
     #add player query
     if event.data == b'add_player':
-        user_controller.add_user(
-            name = event.sender_id,
-            user_id = event.sender_id,
-            clan_id = clan.id,
-            clan = clan
-        )
-        await event.answer("Теперь вы играете за чат в котором вы сейчас находитесь")
-        await bot.delete_messages(event.chat.id, event.message_id)
+        if user is None:
+            user_controller.add_user(
+                name = event.sender_id,
+                user_id = event.sender_id,
+                clan_id = clan.id,
+                clan = clan
+            )
+            await event.answer("Теперь вы играете за чат в котором вы сейчас находитесь")
+            await bot.delete_messages(event.chat.id, event.message_id)
+        else:
+            await event.answer("Вы уже являетесь участником КЛАНа")
+            await bot.delete_messages(event.chat.id, event.message_id)
 
     #delete player query
-    if event.data == b'delete_player':
-        await event.answer("Удаление игрока")
-        await bot.delete_messages(event.chat.id, event.message_id)
-        user_controller.delete_user()
+    if event.data == b'delete_player' and user is not None:
+        if user is not None:
+            await event.answer("Удаление игрока")
+            await bot.delete_messages(event.chat.id, event.message_id)
+            user_controller.delete_user()
+        else:
+            await event.answer("Ваш аккаунт не зарегистрирован в игре")
+            await bot.delete_messages(event.chat.id, event.message_id)
 
     #rules of the game query
     if event.data == b'rules_of_the_game':
@@ -154,10 +164,15 @@ async def callback_answers(event):
             await bot.send_message(event.chat.id, "Юзер инфо")
 
     #start battle
-    if event.data == b'battle':
-        await event.answer("Запрос на битву")
-        await bot.delete_messages(event.chat.id, event.message_id)
-    
+    if event.data[:6] == b"battle":
+        if user is not None:
+            defending_clan_id = event.data[7:].decode('utf-8')
+            attacking_clan_id = event.chat.id
+            await event.answer("Запрос на битву")
+            await bot.delete_messages(event.chat.id, event.message_id)
+        else:
+            await event.answer("Вы не можите проявлять активность. Ваш аккаунт не зарегистрирован в игре")
+            await bot.delete_messages(event.chat.id, event.message_id)
 
 #check database connect
 try:
