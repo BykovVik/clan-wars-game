@@ -3,6 +3,7 @@ from clans import ClanController
 from users import UserController
 from bot import BOT
 from telethon import events, Button
+from game import GameController
 
 bot = BOT
 
@@ -166,10 +167,15 @@ async def callback_answers(event):
     #start battle
     if event.data[:6] == b"battle":
         if user is not None:
+            #calculating id
             defending_clan_id = event.data[7:].decode('utf-8')
             attacking_clan_id = event.chat.id
+            #callback answer
             await event.answer("Запрос на битву")
             await bot.delete_messages(event.chat.id, event.message_id)
+            #create new game
+            game = GameController(attacking_clan_id, defending_clan_id)
+            await game.start_game()
         else:
             await event.answer("Вы не можите проявлять активность. Ваш аккаунт не зарегистрирован в игре")
             await bot.delete_messages(event.chat.id, event.message_id)
