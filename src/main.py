@@ -180,6 +180,8 @@ async def callback_answers(event):
             await event.answer("Вы не можите проявлять активность. Ваш аккаунт не зарегистрирован в игре")
             await bot.delete_messages(event.chat.id, event.message_id)
 
+    
+
 #check database connect
 try:
     create_all_tables()

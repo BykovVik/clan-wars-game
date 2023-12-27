@@ -1,8 +1,10 @@
 from models import session
 from bot import BOT
-from telethon import events, Button
+from telethon import events, Button, types
 from clans import ClanController
 import asyncio
+from telethon.tl.types import InputPeerChat
+from telethon.tl.functions.messages import GetMessageReactionsListRequest
 
 #bot 
 bot = BOT
@@ -20,8 +22,9 @@ class GameController:
 
         a_chat_message = await bot.send_message(self.a_clan.chat_id, "Лукасай этот пост для того что б обыграть своих опонетов")
         d_chat_message = await bot.send_message(self.d_clan.chat_id, "Лукасай этот пост для того что б обыграть своих опонетов")
-        await asyncio.sleep(10)
 
+        await asyncio.sleep(10)
+        
         await self.end_game(a_chat_message.id, d_chat_message.id)
 
     async def end_game(self, a_id, d_id):
