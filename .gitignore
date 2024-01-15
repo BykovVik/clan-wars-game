@@ -1,6 +1,7 @@
 env
 data
 .env
+.vscode
 bot.session
 bot.session-journal
 

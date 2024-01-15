@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, BigInteger
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import DeclarativeBase, relationship
 
@@ -18,7 +18,7 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String)
-    user_id = Column(Integer)
+    user_id = Column(BigInteger)
     score = Column(Integer)
     penalties = Column(Integer)
     rating = Column(Integer)
@@ -34,7 +34,7 @@ class Clan(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String)
-    chat_id = Column(Integer)
+    chat_id = Column(BigInteger)
     users = relationship("User", back_populates="clan")
     wins = Column(Integer)
     losses = Column(Integer)
