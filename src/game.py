@@ -1,7 +1,7 @@
 from models import session
 from clans import ClanController
 import asyncio
-from pyrogram.raw.functions.messages import GetMessageReactionsList
+
 
 class GameController:
 
@@ -15,12 +15,21 @@ class GameController:
 
     async def start_game(self):
 
-        a_chat_message = await self.bot.send_message(self.a_clan.chat_id, "Лукасай этот пост для того что б обыграть своих опонетов АТАКА")
-        d_chat_message = await self.bot.send_message(self.d_clan.chat_id, "Лукасай этот пост для того что б обыграть своих опонетов")
+        a_chat_message = await self.bot.send_message(
+            self.a_clan.chat_id,
+            "Лукасай этот пост для того что б обыграть своих опонетов АТАКА"
+        )
+        d_chat_message = await self.bot.send_message(
+            self.d_clan.chat_id,
+            "Лукасай этот пост для того что б обыграть своих опонетов"
+        )
 
         await asyncio.sleep(10)
-        message = await self.bot.get_messages(self.a_clan.chat_id, a_chat_message.id)
-        await self.end_game(a_chat_message.id, d_chat_message.id)
+        message = await self.bot.get_messages(
+            self.a_clan.chat_id,
+            a_chat_message.id
+        )
+        await self.end_game(message.id, d_chat_message.id)
 
     async def end_game(self, a_id, d_id):
         await self.bot.delete_messages(self.a_clan.chat_id, a_id)
