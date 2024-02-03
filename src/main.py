@@ -112,7 +112,20 @@ async def info_command(client, message):
             "Аккаунт",
             callback_data="account"
         )
-        keyboard = InlineKeyboardMarkup([[button_rules, button_account]])
+        button_clan_info = InlineKeyboardButton(
+            "Наш клан",
+            callback_data="clan"
+        )
+        button_clan_rate = InlineKeyboardButton(
+            "Рейтинг кланов",
+            callback_data="clan_rate"
+        )
+        keyboard = InlineKeyboardMarkup([
+            [button_rules], 
+            [button_account], 
+            [button_clan_info],
+            [button_clan_rate]
+        ])
         # message reply
         await message.reply_text(
             "В этом разделе вы можите ознакомиться с правилами игры, а так же"
@@ -288,7 +301,77 @@ async def callback_answers(client, callback_query):
                 callback_query.message.chat.id,
                 "Юзер инфо"
             )
+        
+    # clan query
+    if callback_query.data == 'clan':
+        if user is None:
+            await callback_query.answer("Вы не зарегистрированы в игре")
+            await client.delete_messages(
+                callback_query.message.chat.id,
+                callback_query.message.id
+            )
+            await client.send_message(
+                callback_query.message.chat.id,
+                "Для того что бы заркгистрироваться в игре, вам необходимо"
+                "выбрать чат за который вы хотите играть, вызвать в нём "
+                "команду `/help`, и зарегистрировать своего юзера в игре."
+            )
+        else:
+            if clan:
+                await callback_query.answer("Информация о КЛАНЕ")
+                await client.delete_messages(
+                    callback_query.message.chat.id,
+                    callback_query.message.id
+                )
+                await client.send_message(
+                    callback_query.message.chat.id,
+                    "Название: {} \n"
+                    "Победы: {} \n"
+                    "Поражения: {} \n"
+                    "Рейтинг: {} \n"
+                    .format(clan.title, clan.wins, clan.losses, clan.rating)
+                )
+            else:
+                await callback_query.answer("КЛАН не зареган")
 
+    # clan rating query
+    if callback_query.data == 'clan_rate':
+        if user is None:
+            await callback_query.answer("Вы не зарегистрированы в игре")
+            await client.delete_messages(
+                callback_query.message.chat.id,
+                callback_query.message.id
+            )
+            await client.send_message(
+                callback_query.message.chat.id,
+                "Для того что бы заркгистрироваться в игре, вам необходимо"
+                "выбрать чат за который вы хотите играть, вызвать в нём "
+                "команду `/help`, и зарегистрировать своего юзера в игре."
+            )
+        else:
+            if clan:
+                await callback_query.answer("Рейтинг кланов")
+                await client.delete_messages(
+                    callback_query.message.chat.id,
+                    callback_query.message.id
+                )
+                # create rating
+                clans = clan_controller.get_all_clans()
+                rating = sorted(clans, key=lambda clan: clan.rating)
+                message_text = ""
+                count = 0
+                for c in reversed(rating):
+                    if count <= 10:
+                        message_text += "{} : {} \n".format(c.title, c.rating)
+                        count += 1
+
+                await client.send_message(
+                    callback_query.message.chat.id,
+                    message_text
+                )
+            else:
+                await callback_query.answer("КЛАН не зареган")
+    
     # start battle
     if callback_query.data[:6] == "battle":
         if user is not None:
