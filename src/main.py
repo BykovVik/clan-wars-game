@@ -3,43 +3,42 @@ from clans import ClanController
 from users import UserController
 from bot import app
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from pyrogram import filters
 from game import GameController
 
 
-@app.on_message()
-async def text_handler(client, message):
-
-    # сhecking for service message requests
-    if message.text[:1] != "/":
-        return
-
-    # checking chat type
-    if message.chat.type.name == "CHANNEL":
-        return
-
+# start command handler
+@app.on_message(filters.command(["start"]))
+async def start_command(client, message):
     # create main objects
     clan_controller = ClanController(message.chat.id)
     clan = clan_controller.get_clan()
 
-    user_controller = UserController(message.from_user.id)
-    user = user_controller.get_user()
-
-    # start command handler
-    if message.text == "/start" and not message.chat.type.name == "PRIVATE":
+    # check chat status
+    if not message.chat.type.name == "PRIVATE":
         # create button
         button = InlineKeyboardButton("Создать клан", callback_data="add_clan")
         keyboard = InlineKeyboardMarkup([[button]])
-        # message reply
-        await message.reply_text(
-            "Это первый бот для социальной игры в Телеграм!\n\nСпециально для"
-            "тебя, мы дали возможность бросить вызов любому чату⚔️ в Телеграме"
-            "👊\n\nИнтересно? Чтобы начать, ДОБАВЬ меня в любой ЧАТ и попроси"
-            "дать мне права АДМИНИСТРАТОРА.\n\n Создай свою тусовку в"
-            "телеграме и стань первым!👊🏻 ",
-            reply_markup=keyboard
-        )
 
-    if message.text == "/start" and message.chat.type.name == "PRIVATE":
+        if clan is None:
+            # message reply
+            await message.reply_text(
+                "Это первый бот для социальной игры в Телеграм!\n\nСпециально для"
+                "тебя, мы дали возможность бросить вызов любому чату⚔️ в Телеграме"
+                "👊\n\nИнтересно? Чтобы начать, ДОБАВЬ меня в любой ЧАТ и попроси"
+                "дать мне права АДМИНИСТРАТОРА.\n\n Создай свою тусовку в"
+                "телеграме и стань первым!👊🏻 ",
+                reply_markup=keyboard
+        )
+        else:
+            await message.reply_text(
+                "Это первый бот для социальной игры в Телеграм!\n\nСпециально для"
+                "тебя, мы дали возможность бросить вызов любому чату⚔️ в Телеграме"
+                "👊\n\nИнтересно? Чтобы начать, ДОБАВЬ меня в любой ЧАТ и попроси"
+                "дать мне права АДМИНИСТРАТОРА.\n\n Создай свою тусовку в"
+                "телеграме и стань первым!👊🏻 "
+            )
+    else:
         await message.reply_text(
             "Это первый бот для социальной игры в Телеграм!\n\nСпециально для"
             "тебя, мы дали возможность бросить вызов любому чату⚔️ в Телеграме"
@@ -48,8 +47,19 @@ async def text_handler(client, message):
             "телеграме и стань первым!👊🏻 "
         )
 
-    # help command handler
-    if message.text == "/help" and not message.chat.type.name == "PRIVATE":
+
+# help command handler
+@app.on_message(filters.command(["help"]))
+async def help_command(client, message):
+    # create main objects
+    clan_controller = ClanController(message.chat.id)
+    clan = clan_controller.get_clan()
+
+    user_controller = UserController(message.from_user.id)
+    user = user_controller.get_user()
+
+    # check chat status
+    if not message.chat.type.name == "PRIVATE":
 
         if clan is None:
             return await message.reply_text(
@@ -87,8 +97,12 @@ async def text_handler(client, message):
                 reply_markup=keyboard
             )
 
-    # info command hendler
-    if message.text == "/info" and message.chat.type.name == "PRIVATE":
+
+# info command handler
+@app.on_message(filters.command(["info"]))
+async def info_command(client, message):
+    # check chat status
+    if not message.chat.type.name == "PRIVATE":
         # create button
         button_rules = InlineKeyboardButton(
             "Прочитать правила игры",
@@ -105,9 +119,15 @@ async def text_handler(client, message):
             "с текущими данными своего игрового аккаунта 👊🏻 ",
             reply_markup=keyboard
         )
+        
 
+@app.on_message(filters.regex(r"^/check"))
+async def text_handler(client, message):
     # ckeck other clans command hendler
-    if message.text[:6] == "/check" and message.chat.type.name != "PRIVATE":
+    if message.chat.type.name != "PRIVATE":
+        # create main objects
+        clan_controller = ClanController(message.chat.id)
+        clan = clan_controller.get_clan()
         if len(message.text) == 6:
             # message reply
             return await message.reply_text(
