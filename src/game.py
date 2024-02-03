@@ -1,6 +1,8 @@
 from models import session
 from clans import ClanController
 import asyncio
+import requests
+import json
 
 
 class GameController:
@@ -25,11 +27,14 @@ class GameController:
         )
 
         await asyncio.sleep(10)
-        message = await self.bot.get_messages(
-            self.a_clan.chat_id,
-            a_chat_message.id
-        )
-        await self.end_game(message.id, d_chat_message.id)
+        # http://localhost:8000/messages/-1001414907164/34193
+        a_url = f"http://localhost:8000/messages/{self.a_clan.chat_id}/{a_chat_message.id}"
+        d_url = f"http://localhost:8000/messages/{self.d_clan.chat_id}/{d_chat_message.id}"
+        a_count = requests.get(a_url)
+        b_count = requests.get(d_url)
+        a = json.loads(a_count.text)['reactions_count']
+        b = json.loads(b_count.text)['reactions_count']
+        await self.end_game(a_chat_message.id, d_chat_message.id)
 
     async def end_game(self, a_id, d_id):
         await self.bot.delete_messages(self.a_clan.chat_id, a_id)
