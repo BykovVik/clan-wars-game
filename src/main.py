@@ -1,105 +1,52 @@
-from models import create_all_tables
-from clans import ClanController
-from users import UserController
 from bot import app
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 from pyrogram import filters
 from game import GameController
+import requests
 
 
 # start command handler
 @app.on_message(filters.command(["start"]))
 async def start_command(client, message):
-    # create main objects
-    clan_controller = ClanController(message.chat.id)
-    clan = clan_controller.get_clan()
-
     # check chat status
-    if not message.chat.type.name == "PRIVATE":
-        # create button
-        button = InlineKeyboardButton("Создать клан", callback_data="add_clan")
-        keyboard = InlineKeyboardMarkup([[button]])
-
-        if clan is None:
-            # message reply
-            await message.reply_text(
-                "Это первый бот для социальной игры в Телеграм!\n\nСпециально для"
-                "тебя, мы дали возможность бросить вызов любому чату⚔️ в Телеграме"
-                "👊\n\nИнтересно? Чтобы начать, ДОБАВЬ меня в любой ЧАТ и попроси"
-                "дать мне права АДМИНИСТРАТОРА.\n\n Создай свою тусовку в"
-                "телеграме и стань первым!👊🏻 ",
-                reply_markup=keyboard
+    if message.chat.type.name == "PRIVATE":
+        web_app_url = "https://5c73-91-207-27-93.ngrok-free.app"
+        keyboard = InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton(
+                        text="Open Web App", 
+                        web_app=WebAppInfo(url=web_app_url)
+                    )
+                ]
+            ]
         )
-        else:
-            await message.reply_text(
-                "Это первый бот для социальной игры в Телеграм!\n\nСпециально для"
-                "тебя, мы дали возможность бросить вызов любому чату⚔️ в Телеграме"
-                "👊\n\nИнтересно? Чтобы начать, ДОБАВЬ меня в любой ЧАТ и попроси"
-                "дать мне права АДМИНИСТРАТОРА.\n\n Создай свою тусовку в"
-                "телеграме и стань первым!👊🏻 "
-            )
+        await message.reply("Click the button below to open the Web App:", reply_markup=keyboard)
     else:
-        await message.reply_text(
-            "Это первый бот для социальной игры в Телеграм!\n\nСпециально для"
-            "тебя, мы дали возможность бросить вызов любому чату⚔️ в Телеграме"
-            "👊\n\nИнтересно? Чтобы начать, ДОБАВЬ меня в любой ЧАТ и попроси"
-            "дать мне права АДМИНИСТРАТОРА.\n\n Создай свою тусовку в"
-            "телеграме и стань первым!👊🏻 "
-        )
+        chat_id = int(message.chat.id)
+        chat_title = str(message.chat.title)
+        requests.post("http://127.0.0.1:8000/clans/", json={
+            "title": chat_title,
+            "chat_id": chat_id,
+            "wins": 0,
+            "losses": 0,
+            "rating": 0
+        })
+        await app.send_message(message.chat.id, "тест")
 
 
 # help command handler
 @app.on_message(filters.command(["help"]))
 async def help_command(client, message):
-    # create main objects
-    clan_controller = ClanController(message.chat.id)
-    clan = clan_controller.get_clan()
 
-    user_controller = UserController(message.from_user.id)
-    user = user_controller.get_user()
-
-    # check chat status
     if not message.chat.type.name == "PRIVATE":
-
-        if clan is None:
-            return await message.reply_text(
-                "В вашем чате НЕ создан клан, нажмите команду `/start` и"
-                "следуйте дальнейшим инструкциям"
-            )
-
-        if user is None:
-            # create button
-            button = InlineKeyboardButton(
-                "Играть за этот ЧАТ",
-                callback_data="add_player"
-            )
-            keyboard = InlineKeyboardMarkup([[button]])
-            # message reply
-            await message.reply_text(
-                "Это первый бот для социальной игры в Телеграм!\n\nСпециально"
-                "для тебя, мы дали возможность бросить вызов любому чату⚔️ в"
-                "Телеграме 👊\n\nИнтересно? Чтобы начать, зарегистрируйся как"
-                "игрок в чате, за который ты хочешь играть 👊🏻 ",
-                reply_markup=keyboard
-            )
-        else:
-            # create button
-            button = InlineKeyboardButton(
-                "Удалить аккаунт",
-                callback_data="delete_player"
-            )
-            keyboard = InlineKeyboardMarkup([[button]])
-            # message reply
-            await message.reply_text(
-                "Вы уже зарегистрированы как игрок. Для подробной информации о"
-                "вашем аккаунте игрока, вы можите обратится к нашему боту в"
-                "личные сообщения, запросив комманду `/info`",
-                reply_markup=keyboard
-            )
+        pass
+    else:
+        pass
 
 
 # info command handler
-@app.on_message(filters.command(["info"]))
+"""@app.on_message(filters.command(["info"]))
 async def info_command(client, message):
     # check chat status
     if not message.chat.type.name == "PRIVATE":
@@ -405,14 +352,6 @@ async def callback_answers(client, callback_query):
             await client.delete_messages(
                 callback_query.message.chat.id,
                 callback_query.message.id
-            )
-
-
-# check database connect
-try:
-    create_all_tables()
-    print("Tables created successfully")
-except Exception as e:
-    print(e)
+            )"""
 
 app.run()
