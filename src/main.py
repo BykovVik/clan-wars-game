@@ -23,16 +23,19 @@ async def start_command(client, message):
         )
         await message.reply("Click the button below to open the Web App:", reply_markup=keyboard)
     else:
-        chat_id = int(message.chat.id)
-        chat_title = str(message.chat.title)
-        requests.post("http://127.0.0.1:8000/clans/", json={
-            "title": chat_title,
-            "chat_id": chat_id,
-            "wins": 0,
-            "losses": 0,
-            "rating": 0
-        })
-        await app.send_message(message.chat.id, "тест")
+        button_reg_clan = InlineKeyboardButton(
+            "Зарегистрировать чат в игре",
+            callback_data="clan_reg"
+        )
+        keyboard = InlineKeyboardMarkup([
+            
+            [button_reg_clan]
+        ])
+        # message reply
+        await message.reply_text(
+            "После регистрации в игре, ваш чат становится полноценным участником сражений и вас могут вызвать на битву в любое время суток.👊🏻 ",
+            reply_markup=keyboard
+        )
 
 
 # help command handler
@@ -43,6 +46,21 @@ async def help_command(client, message):
         pass
     else:
         pass
+
+
+@app.on_callback_query()
+async def callback_answers(client, callback_query):
+    if callback_query.data == 'clan_reg':
+        chat_id = int(callback_query.message.chat.id)
+        chat_title = str(callback_query.message.chat.title)
+        requests.post("http://127.0.0.1:8000/clans/", json={
+            "title": chat_title,
+            "chat_id": chat_id,
+            "wins": 0,
+            "losses": 0,
+            "rating": 0
+        })
+        await callback_query.answer("Клан вашего чата успешно создан")
 
 
 # info command handler
