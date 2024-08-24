@@ -58,9 +58,12 @@ async def callback_answers(client, callback_query):
             "chat_id": chat_id,
             "wins": 0,
             "losses": 0,
-            "rating": 0
         })
         await callback_query.answer("Клан вашего чата успешно создан")
+        await client.delete_messages(
+            callback_query.message.chat.id,
+            callback_query.message.id
+        )
 
 
 # info command handler
