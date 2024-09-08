@@ -65,6 +65,27 @@ async def callback_answers(client, callback_query):
             callback_query.message.id
         )
 
+    if callback_query.data.split(":")[0] == 'no_battle':
+        await callback_query.answer("Вам отказали")
+        await client.delete_messages(
+            callback_query.message.chat.id,
+            callback_query.message.id
+        )
+        await client.send_message(callback_query.from_user.id,
+            "Клан, который вы вызывали, отказал вам в битве")
+        
+
+
+
+
+    """game = GameController(
+        attacking_clan_id,
+        defending_clan_id,
+        client
+        )
+    await game.start_game()"""
+        
+
 
 # info command handler
 """@app.on_message(filters.command(["info"]))
