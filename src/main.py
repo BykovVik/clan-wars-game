@@ -10,7 +10,7 @@ import requests
 async def start_command(client, message):
     # check chat status
     if message.chat.type.name == "PRIVATE":
-        web_app_url = "https://5c73-91-207-27-93.ngrok-free.app"
+        web_app_url = "https://bykovvik.github.io/clan-wars-twa-gitpage"
         keyboard = InlineKeyboardMarkup(
             [
                 [
@@ -53,7 +53,7 @@ async def callback_answers(client, callback_query):
     if callback_query.data == 'clan_reg':
         chat_id = int(callback_query.message.chat.id)
         chat_title = str(callback_query.message.chat.title)
-        requests.post("http://127.0.0.1:8000/clans/", json={
+        requests.post("http://127.0.0.1:8000/clan/", json={
             "title": chat_title,
             "chat_id": chat_id,
             "wins": 0,
